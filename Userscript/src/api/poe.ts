@@ -27,6 +27,6 @@ export async function executeTeleport(token: string) {
       reject(new Error("Network error"));
     };
 
-    xhr.send(JSON.stringify({ token }));
+    xhr.send(JSON.stringify({ continue: true, token }));
   });
 }
