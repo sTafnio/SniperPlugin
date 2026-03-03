@@ -159,15 +159,22 @@ public class SniperLogic(SniperPlugin plugin)
                                 break;
                             }
 
-                            DebugWindow.LogMsg($"[Sniper] Attempt {i + 1} of {maxAttempts}");
-                            await inputController.Click(MouseButtons.Left);
-
                             if (_plugin.GameController.IngameState.ServerData.Gold < startingGold)
                             {
                                 DebugWindow.LogMsg($"[Sniper] Purchase Successful for {item.Name}");
                                 successfulPurchase = true;
                                 break;
                             }
+
+                            var uiHover = _plugin.GameController.IngameState.UIHover;
+                            if (uiHover == null)
+                            {
+                                DebugWindow.LogMsg($"[Sniper] Hover Item lost for {item.Name}. Aborting.");
+                                break;
+                            }
+
+                            DebugWindow.LogMsg($"[Sniper] Attempt {i + 1} of {maxAttempts}");
+                            await inputController.Click(MouseButtons.Left);
                         }
 
                         inputController.SetDelayOverrides();
