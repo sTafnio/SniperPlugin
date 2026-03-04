@@ -39,8 +39,11 @@ public class SniperPluginSettings : ISettings
     [Menu("Purchase Window Timeout", "Timeout for purchase window to appear (from start of teleport)")]
     public RangeNode<int> PurchaseWindowTimeout { get; set; } = new(6, 1, 20);
 
-    [Menu("Skip Key", "Key to skip the current item")]
-    public HotkeyNodeV2 SkipKey { get; set; } = new(Keys.None);
+    [Menu("Stop Stashie", "Stop Stashie when an item is found")]
+    public ToggleNode StopStashie { get; set; } = new(false);
+
+    [Menu("Stop MyLittleCrafter", "Stop MyLittleCrafter when an item is found")]
+    public ToggleNode StopMyLittleCrafter { get; set; } = new(false);
 
     [Menu("Cache", "Cache game window, purchase window location and size")]
     public ButtonNode Cache { get; set; } = new();

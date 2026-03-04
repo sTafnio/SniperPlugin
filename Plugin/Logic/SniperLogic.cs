@@ -54,6 +54,12 @@ public class SniperLogic(SniperPlugin plugin)
             return;
         }
 
+        if (_plugin.Settings.StopStashie.Value)
+            _plugin.StopStashie?.Invoke();
+
+        if (_plugin.Settings.StopMyLittleCrafter.Value)
+            _plugin.StopMyLittleCrafter?.Invoke();
+
         DebugWindow.LogMsg($"[Sniper] Teleport Success. Starting Purchase Sequence for {CurrentItem.Name}");
         PurchaseSequenceTask = RunPurchaseSequence(CurrentItem);
     }
@@ -91,9 +97,9 @@ public class SniperLogic(SniperPlugin plugin)
 
                 // 1. Wait for Loading Screen
                 using var loadingWaitCts = new CancellationTokenSource(timeoutMs);
-                var hasStartedLoading = await TaskUtils.CheckEveryFrame(() => _plugin.GameController.IsLoading, loadingWaitCts.Token);
+                var hasStartedLoading = await TaskUtils.CheckEveryFrame(() => _plugin.GameController.IsLoading || _plugin.GameController.IngameState.IngameUi.PurchaseWindow.IsVisible, loadingWaitCts.Token);
 
-                if (!hasStartedLoading && !_plugin.GameController.IngameState.IngameUi.PurchaseWindow.IsVisible)
+                if (!hasStartedLoading)
                 {
                     DebugWindow.LogMsg($"[Sniper] Loading screen didn't appear within {timeoutMs}ms for {item.Name}");
                     return false;
@@ -111,7 +117,7 @@ public class SniperLogic(SniperPlugin plugin)
 
                 if (_plugin.Settings.AutoPurchase.Value)
                 {
-                    await inputController.KeyDown(Keys.ControlKey);
+                    await inputController.KeyDown(Keys.LControlKey);
                 }
 
                 // 3. Wait for Purchase Window
@@ -139,7 +145,6 @@ public class SniperLogic(SniperPlugin plugin)
 
                     for (int i = 0; i < maxAttempts; i++)
                     {
-
                         if (!_plugin.GameController.IngameState.IngameUi.PurchaseWindow.IsVisible)
                         {
                             DebugWindow.LogMsg($"[Sniper] Purchase Window lost for {item.Name}. Aborting.");
@@ -166,7 +171,7 @@ public class SniperLogic(SniperPlugin plugin)
 
                     inputController.SetDelayOverrides();
 
-                    await inputController.KeyUp(Keys.ControlKey);
+                    await inputController.KeyUp(Keys.LControlKey);
 
                     if (_plugin.GameController.IngameState.IngameUi.PurchaseWindow is { IsVisible: true })
                     {
@@ -189,7 +194,7 @@ public class SniperLogic(SniperPlugin plugin)
                 DebugWindow.LogMsg($"[Sniper] Sequence Complete for {item.Name}. Releasing Queue.");
 
                 if (_plugin.Settings.LockMouse.Value) MouseLock.Unlock();
-                if (Input.IsKeyDown(Keys.ControlKey)) await inputController.KeyUp(Keys.ControlKey);
+                if (Input.IsKeyDown(Keys.LControlKey)) await inputController.KeyUp(Keys.LControlKey);
 
                 CurrentItem = null;
                 PurchaseSequenceTask = null;

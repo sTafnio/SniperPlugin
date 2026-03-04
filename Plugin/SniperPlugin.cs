@@ -4,6 +4,7 @@ using SniperPlugin.Logic;
 using ImGuiNET;
 using SniperPlugin.Utils;
 using ExileCore.Shared;
+using System;
 
 namespace SniperPlugin;
 
@@ -15,6 +16,9 @@ public class SniperPlugin : BaseSettingsPlugin<SniperPluginSettings>
     public WindowCache Cache;
     public ItemDeduplicator Deduplicator;
     public ExecutionQueue Queue;
+
+    public Action? StopStashie;
+    public Action? StopMyLittleCrafter;
 
     public SniperPlugin() : base()
     {
@@ -31,6 +35,18 @@ public class SniperPlugin : BaseSettingsPlugin<SniperPluginSettings>
 
         Settings.StartStopServer.DrawDelegate = DrawServerStatus;
         Settings.Cache.OnPressed = Cache.Cache;
+
+        StopStashie = GameController.PluginBridge.GetMethod<Action>("Stashie.Stop");
+        if (StopStashie == null)
+            LogError("Stahie.Stop is null");
+        else
+            DebugWindow.LogMsg("[Sniper] Stashie.Stop is available");
+
+        StopMyLittleCrafter = GameController.PluginBridge.GetMethod<Action>("MyLittleCrafter.Stop");
+        if (StopMyLittleCrafter == null)
+            LogError("MyLittleCrafter.Stop is null");
+        else
+            DebugWindow.LogMsg("[Sniper] MyLittleCrafter.Stop is available");
 
         return true;
     }
